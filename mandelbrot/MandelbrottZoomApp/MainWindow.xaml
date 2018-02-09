@@ -7,8 +7,10 @@
         mc:Ignorable="d"
         Title="MandelbrottZoomer" Height="1024" Width="1024" VerticalAlignment="Top" HorizontalAlignment="Center">
     <Canvas>
-        <Canvas MouseLeftButtonDown="setCanvas_MouseLeftButtonDown" Name="setCanvas">
-            <Image x:Name="set"> </Image>
+        <Canvas MouseLeftButtonDown="setCanvas_MouseLeftButtonDown" MouseRightButtonDown="setCanvas_MouseRightButtonDown"  Name="setCanvas">
+            <Image x:Name="set"></Image>
         </Canvas>
+        <Button Click="Reset_Click" x:Name="Reset" Content="Reset" Canvas.Left="136" Canvas.Top="912" Width="84" RenderTransformOrigin="2.421,0.7" Height="44"/>
+        <Button Click="Save_Click"  x:Name="Save" Content="Save" Canvas.Left="772" Canvas.Top="912" Width="84" IsCancel="True" Height="44"/>
     </Canvas>
 </Window>

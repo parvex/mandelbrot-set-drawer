@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 using System.Numerics;
 using System.Drawing;
 
-
 namespace mandelbrot
 {
     class MandelbrotImage
     {
-        Dictionary<int, Color> colors = new Dictionary<int, Color>();
+        static Dictionary<int, Color> colors = new Dictionary<int, Color>();
         Bitmap bitmap;
         //size of the image
-        int bmpXmax = 1024;
-        int bmpYmax = 1024;
+        static int bmpXmax = 1024;
+        static int bmpYmax = 1024;
+        //number of iterations before accepting point
+        static int iter_max = 150;
+        static int zoom = 4;
         //domain in which mandelbrott set is being tested  
         double xmin = -2.2;
         double xmax = 1.2;
@@ -23,14 +25,24 @@ namespace mandelbrot
         double ymax = 1.7;
         double height;
         double width;
-        //number of iterations before accepting point
-        int iter_max = 150;
 
-        int zoom = 4;
+
+
+        public MandelbrotImage(MandelbrotImage im)
+        {
+            bitmap = new Bitmap(bmpXmax, bmpYmax);
+            xmin = im.xmin;
+            xmax = im.xmax;
+            ymin = im.ymin;
+            ymax = im.ymax;
+            height = im.height;
+            width = im.width;
+        }
+
 
 
         //picking random colors for every iter break numbers
-        private void generateColors()
+        private static void generateColors()
         {
             for(int i = 0; i < iter_max; i++)
             {
@@ -40,7 +52,7 @@ namespace mandelbrot
         }
 
         //gradient color generator from 0 to iter_max
-        private Color IntToColor(int i)
+        static private Color IntToColor(int i)
         {
             Color[] colorz = new Color[] { Color.Black, Color.Blue, Color.Cyan, Color.Green, Color.Yellow, Color.Orange, Color.Red, Color.White, Color.Transparent };
             float scaled = (float)(i) / iter_max * 7;
@@ -52,6 +64,11 @@ namespace mandelbrot
             int resultG = (byte)((1 - fraction) * (float)color0.G + fraction * (float)color1.G);
             int resultB = (byte)((1 - fraction) * (float)color0.B + fraction * (float)color1.B);
             return Color.FromArgb(resultR, resultG, resultB);
+        }
+
+        static MandelbrotImage()
+        {
+            generateColors();
         }
 
         public MandelbrotImage()
@@ -114,10 +131,10 @@ namespace mandelbrot
             DecPoint center = scale((double)x, (double)y);
             height = height / zoom;
             width = width / zoom;
-            xmin = center.X - width / zoom;
-            xmax = center.X + width / zoom;
-            ymin = center.Y - height / zoom;
-            ymax = center.Y + height / zoom;
+            xmin = center.X - width / 2;
+            xmax = center.X + width / 2;
+            ymin = center.Y - height / 2;
+            ymax = center.Y + height / 2;
             generateBitmap();
         }
     }

@@ -23,12 +23,14 @@ namespace MandelbrottZoomApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        MandelbrotImage mandelbrott;
+        int nrZoom = 1;
+        LimitedStack<MandelbrotImage> stack = new LimitedStack<MandelbrotImage>(10);
         public MainWindow()
         {
-            mandelbrott = new MandelbrotImage();
+            WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+            stack.Push(new MandelbrotImage());
             InitializeComponent();
-            set.Source = getSource(mandelbrott.getBitmap());
+            set.Source = getSource(stack.Peek().getBitmap());
         }
 
 
@@ -51,9 +53,44 @@ namespace MandelbrottZoomApp
         private void setCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             System.Windows.Point position = Mouse.GetPosition(set);
+            
+            stack.Push(new MandelbrotImage(stack.Peek()));
+            stack.Peek().centerAndZoom(position.X, position.Y);
+            set.Source = getSource(stack.Peek().getBitmap());
+            nrZoom++;
 
-            mandelbrott.centerAndZoom(position.X, position.Y);
-            set.Source = getSource(mandelbrott.getBitmap());
+        }
+
+        private void setCanvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (stack.Count == 1)
+                return;
+            stack.Pop();
+            set.Source = getSource(stack.Peek().getBitmap());
+            nrZoom--;
+        }
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            stack.Clear();
+            stack.Push(new MandelbrotImage());
+            set.Source = getSource(stack.Peek().getBitmap());
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "Mandelbrott";
+            dlg.DefaultExt = ".png"; 
+            dlg.Filter = "Png files (.png)|*.png"; 
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+
+                stack.Peek().getBitmap().Save(dlg.FileName);
+            }
         }
     }
 }
